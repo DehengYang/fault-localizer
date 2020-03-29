@@ -1,3 +1,10 @@
+die() {
+  echo "$@" >&2
+  exit 1
+}
+
+
+##### basic configuration
 SCRIPT_DIR=`pwd`
 source "$SCRIPT_DIR/pathUtil.sh" || exit 1
 
@@ -10,7 +17,7 @@ GZOLTAR_CLI_JAR=lib/com.gzoltar.cli-${gz_version}-jar-with-dependencies.jar
 GZOLTAR_AGENT_JAR=lib/com.gzoltar.agent.rt-${gz_version}-all.jar
 
 
-#d4j bug configuration
+##### d4j bug configuration & not used at present
 depJunit=/home/apr/env/mavenDownload/junit/junit/4.11/junit-4.11.jar
 
 
@@ -51,7 +58,7 @@ cat "$D4J_DIR/framework/projects/$pid/loaded_classes/$bid.src" | sed 's/$/:/' | 
 classes_to_debug=$(cat "${output_dir}/classes.txt")
 
 #### test & a bug fix for closure 103 (ommitted com.google.javascript.jscomp.DisambiguateProperties$JSTypeSystem)
-classes_to_debug="com.google.javascript.jscomp.DisambiguateProperties\$JSTypeSystem"
+#classes_to_debug="com.google.javascript.jscomp.DisambiguateProperties\$JSTypeSystem"
 
 ##### collect test execution data (generate gzoltar.ser)
 echo "$pid_$bid" >> time.txt
