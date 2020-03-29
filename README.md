@@ -1,6 +1,8 @@
 ## fault localizer 
 
-This script is written based on two repos: https://github.com/GZoltar/gzoltar/blob/master/com.gzoltar.cli.examples/run.sh & https://github.com/SerVal-DTF/FL-VS-APR/blob/master/FaultLocalization/GZoltar-1.7.3/runGZoltar.sh
+This script is written based on two repos: 
++ https://github.com/GZoltar/gzoltar/blob/master/com.gzoltar.cli.examples/run.sh
++ https://github.com/SerVal-DTF/FL-VS-APR/blob/master/FaultLocalization/GZoltar-1.7.3/runGZoltar.sh
 
 ### An example for running runGZoltar.sh
 
@@ -11,6 +13,7 @@ To run gzoltar for localizing the buggy lines of **Closure_103**:
 + high time cost comparing against GZoltar v0.1.1
 + two of three buggy lines are not localized even considering subclass `com.google.javascript.jscomp.DisambiguateProperties$JSTypeSystem`
 
+**Replication steps**:
 1) download Closure_103:
 `./single-download.sh Closure 103`
 
@@ -22,7 +25,9 @@ To run gzoltar for localizing the buggy lines of **Closure_103**:
 This is much longer than GZoltar v0.1.1 that cost no more than 2 minutes as I previously tried.
 
 + only one of the three buggy locs are localized.
-`com.google.javascript.jscomp$ControlFlowAnalysis#mayThrowException(com.google.javascript.rhino.Node):894;0.015819299929208316`
+```
+com.google.javascript.jscomp$ControlFlowAnalysis#mayThrowException(com.google.javascript.rhino.Node):894;0.015819299929208316
+```
 (buggy locs of Closure_103 can be found at: http://program-repair.org/defects4j-dissection/#!/bug/Closure/103)
 -> after including: `com.google.javascript.jscomp.DisambiguateProperties$JSTypeSystem`   (i.e., only consider this class) (`classes_to_debug="com.google.javascript.jscomp.DisambiguateProperties\$JSTypeSystem"`)
 the time cost of collecting coverage is still kind of large: 656 s
