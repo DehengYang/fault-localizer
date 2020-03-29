@@ -25,7 +25,7 @@ bug_dir="./$pid/${pid}_${bid}" # bug directory
 #/mnt/benchmarks/repairDir/Kali_Defects4J_Closure_103/src/ 
 deps=${bug_dir}/lib/junit4-legacy.jar:${bug_dir}/lib/protobuf_deploy.jar:${bug_dir}/lib/google_common_deploy.jar:${bug_dir}/lib/ant_deploy.jar:${bug_dir}/lib/junit4-core.jar:${bug_dir}/lib/libtrunk_rhino_parser_jarjared.jar:${bug_dir}/lib/hamcrest-core-1.1.jar
 
-output_dir="result/${pid}-${bid}"
+output_dir="result-2/${pid}-${bid}"
 mkdir -p $output_dir
 unit_tests_file="$output_dir/tests.txt" # all test methods.
 ser_file="$output_dir/gzoltar.ser"
@@ -50,6 +50,8 @@ cat "$D4J_DIR/framework/projects/$pid/loaded_classes/$bid.src" | sed 's/$/:/' | 
 #cat "$D4J_DIR/framework/projects/Closure/loaded_classes/103.src" | sed 's/$/$*:/' | sed ':a;N;$!ba;s/\n//g' >> "${output_dir}/classes.txt"
 classes_to_debug=$(cat "${output_dir}/classes.txt")
 
+#### test & a bug fix for closure 103 (ommitted com.google.javascript.jscomp.DisambiguateProperties$JSTypeSystem)
+classes_to_debug="com.google.javascript.jscomp.DisambiguateProperties\$JSTypeSystem"
 
 ##### collect test execution data (generate gzoltar.ser)
 echo "$pid_$bid" >> time.txt
