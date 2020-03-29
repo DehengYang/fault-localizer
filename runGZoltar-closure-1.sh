@@ -22,7 +22,7 @@ depJunit=/home/apr/env/mavenDownload/junit/junit/4.11/junit-4.11.jar
 
 
 ##### bug settings
-pid="Clsoure"       # Project name
+pid="Closure"       # Project name
 bid="1"       # bug id
 
 bug_dir="./$pid/${pid}_${bid}" # bug directory
@@ -51,7 +51,7 @@ java -cp $src_classes_dir:$test_classpath:$JUNIT_JAR:$HAMCREST_JAR:$GZOLTAR_CLI_
 
 ##### get classes to debug
 cat "$D4J_DIR/framework/projects/$pid/loaded_classes/$bid.src" | sed 's/$/:/' | sed ':a;N;$!ba;s/\n//g'  >  "${output_dir}/classes.txt"
-cat "$D4J_DIR/framework/projects/Closure/loaded_classes/103.src" | sed 's/$/$*:/' | sed ':a;N;$!ba;s/\n//g' >> "${output_dir}/classes.txt"
+#cat "$D4J_DIR/framework/projects/Closure/loaded_classes/103.src" | sed 's/$/$*:/' | sed ':a;N;$!ba;s/\n//g' >> "${output_dir}/classes.txt"
 classes_to_debug=$(cat "${output_dir}/classes.txt")
 
 ##### collect test execution data (generate gzoltar.ser)

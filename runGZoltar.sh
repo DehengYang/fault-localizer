@@ -54,7 +54,7 @@ java -cp $src_classes_dir:$test_classpath:$JUNIT_JAR:$HAMCREST_JAR:$GZOLTAR_CLI_
 
 ##### get classes to debug
 cat "$D4J_DIR/framework/projects/$pid/loaded_classes/$bid.src" | sed 's/$/:/' | sed ':a;N;$!ba;s/\n//g'  >  "${output_dir}/classes.txt"
-cat "$D4J_DIR/framework/projects/Closure/loaded_classes/103.src" | sed 's/$/$*:/' | sed ':a;N;$!ba;s/\n//g' >> "${output_dir}/classes.txt"
+#cat "$D4J_DIR/framework/projects/Closure/loaded_classes/103.src" | sed 's/$/$*:/' | sed ':a;N;$!ba;s/\n//g' >> "${output_dir}/classes.txt"
 classes_to_debug=$(cat "${output_dir}/classes.txt")
 
 #### test & a bug fix for closure 103 (ommitted com.google.javascript.jscomp.DisambiguateProperties$JSTypeSystem)

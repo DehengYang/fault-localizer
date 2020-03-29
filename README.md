@@ -37,10 +37,15 @@ Error: Could not find or load main class com.google.javascript.rhino.jstype.Stri
 [ERROR] GZoltar runTestMethods command has failed for Closure-103b version!
 ```
 
-
 ### running runGZoltar-closure-1.sh
 
 This is for fault localization of Closure 1.
 
+The time cost of collecting coverage: 189 s (This is much less time-consuming than before)
+
 **Summarized Problems**:
 + Many `initializationError` tests in [sfl_tests.csv](./result/Closure-1/sfl_tests.csv)
+This is due to the 35 `JUNIT,<test_name>#initializationError` in [tests.txt](./result/Closure-1/tests.txt) (maybe that's why the time cost is not so high, as many tests are not found and executed)
+
+
+
