@@ -1,6 +1,10 @@
-      * [fault localizer](#fault-localizer)
-         * [An example for running runGZoltar.sh](#an-example-for-running-rungzoltarsh)
-         * [running runGZoltar-closure-1.sh](#running-rungzoltar-closure-1sh)
+* [fault localizer](#fault-localizer)
+  * [An example for running runGZoltar\.sh](#an-example-for-running-rungzoltarsh)
+    * [Summarized problems](#summarized-problems)
+    * [Replication steps](#replication-steps)
+  * [running runGZoltar\-closure\-1\.sh](#running-rungzoltar-closure-1sh)
+    * [Summarized Problems](#summarized-problems-1)
+
 
 
 ## fault localizer 
@@ -13,12 +17,12 @@ This script is written based on two repos:
 
 To run gzoltar for localizing the buggy lines of **Closure_103**:
 
-**Summarized problems** (see below for details):
+#### Summarized problems
 + `cat "$D4J_DIR/framework/projects/Closure/loaded_classes/103.src" | sed 's/$/$*:/' | sed ':a;N;$!ba;s/\n//g' >> "${output_dir}/classes.txt"` will cause error.
 + high time cost comparing against GZoltar v0.1.1
 + two of three buggy lines are not localized even considering subclass `com.google.javascript.jscomp.DisambiguateProperties$JSTypeSystem`
 
-**Replication steps**:
+#### Replication steps
 1) download Closure_103:
 `./single-download.sh Closure 103`
 
@@ -53,7 +57,7 @@ This is for fault localization of Closure 1.
 
 The time cost of collecting coverage: 189 s (This is much less time-consuming than before)
 
-**Summarized Problems**:
+#### Summarized Problems
 + Many `initializationError` tests in [sfl_tests.csv](./result/Closure-1/sfl_tests.csv)
 This is due to the 35 `JUNIT,<test_name>#initializationError` in [tests.txt](./result/Closure-1/tests.txt) (maybe that's why the time cost is not so high, as many tests are not found and executed)
 
