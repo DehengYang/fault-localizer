@@ -22,15 +22,13 @@ depJunit=/home/apr/env/mavenDownload/junit/junit/4.11/junit-4.11.jar
 
 
 ##### bug settings
-pid="$1"       # Project name
-bid="$2"       # bug id
+pid="Clsoure"       # Project name
+bid="1"       # bug id
 
 bug_dir="./$pid/${pid}_${bid}" # bug directory
 
-# closure 103
-#/mnt/benchmarks/repairDir/Kali_Defects4J_Closure_103/build/classes:/mnt/benchmarks/repairDir/Kali_Defects4J_Closure_103/build/test:
-#/mnt/benchmarks/repairDir/Kali_Defects4J_Closure_103/src/ 
-deps=${bug_dir}/lib/junit4-legacy.jar:${bug_dir}/lib/protobuf_deploy.jar:${bug_dir}/lib/google_common_deploy.jar:${bug_dir}/lib/ant_deploy.jar:${bug_dir}/lib/junit4-core.jar:${bug_dir}/lib/libtrunk_rhino_parser_jarjared.jar:${bug_dir}/lib/hamcrest-core-1.1.jar
+# closure 1
+deps=${bug_dir}/build/lib/rhino.jar:${bug_dir}/lib/args4j.jar:${bug_dir}/lib/junit.jar:${bug_dir}/lib/json.jar:${bug_dir}/lib/ant-launcher.jar:${bug_dir}/lib/jarjar.jar:${bug_dir}/lib/jsr305.jar:${bug_dir}/lib/protobuf-java.jar:${bug_dir}/lib/ant.jar:${bug_dir}/lib/guava.jar:${bug_dir}/lib/caja-r4314.jar:${bug_dir}/lib/rhino/testsrc/org/mozilla/javascript/tests/commonjs/module/modules.jar
 
 output_dir="result/${pid}-${bid}"
 mkdir -p $output_dir
@@ -51,14 +49,10 @@ java -cp $src_classes_dir:$test_classpath:$JUNIT_JAR:$HAMCREST_JAR:$GZOLTAR_CLI_
   com.gzoltar.cli.Main listTestMethods $test_classpath \
     --outputFile "$unit_tests_file"
 
-
 ##### get classes to debug
 cat "$D4J_DIR/framework/projects/$pid/loaded_classes/$bid.src" | sed 's/$/:/' | sed ':a;N;$!ba;s/\n//g'  >  "${output_dir}/classes.txt"
 cat "$D4J_DIR/framework/projects/Closure/loaded_classes/103.src" | sed 's/$/$*:/' | sed ':a;N;$!ba;s/\n//g' >> "${output_dir}/classes.txt"
 classes_to_debug=$(cat "${output_dir}/classes.txt")
-
-#### test & a bug fix for closure 103 (ommitted com.google.javascript.jscomp.DisambiguateProperties$JSTypeSystem)
-#classes_to_debug="com.google.javascript.jscomp.DisambiguateProperties\$JSTypeSystem"
 
 ##### collect test execution data (generate gzoltar.ser)
 echo "${pid}_$bid" >> time.txt
