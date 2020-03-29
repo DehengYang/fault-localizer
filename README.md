@@ -1,3 +1,8 @@
+      * [fault localizer](#fault-localizer)
+         * [An example for running runGZoltar.sh](#an-example-for-running-rungzoltarsh)
+         * [running runGZoltar-closure-1.sh](#running-rungzoltar-closure-1sh)
+
+
 ## fault localizer 
 
 This script is written based on two repos: 
