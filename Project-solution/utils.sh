@@ -1,4 +1,7 @@
-#!/usr/bin/env bash
+#!/bin/bash
+
+
+####!/usr/bin/env bash
 
 PWD=$(cd `dirname ${BASH_SOURCE[0]}` && pwd)
 
@@ -40,7 +43,7 @@ _checkout() {
 
   local output_dir="/tmp/$USER-$$-$pid-$bid"
   rm -rf "$output_dir"; mkdir -p "$output_dir"
-  "$D4J_HOME/framework/bin/defects4j" checkout -p "$pid" -v "${bid}$version" -w "$output_dir" || return 1
+  "$D4J_HOME_FOR_FL/framework/bin/defects4j" checkout -p "$pid" -v "${bid}$version" -w "$output_dir" || return 1
   [ -d "$output_dir" ] || die "$output_dir does not exist!"
 
   if [ "$pid" == "Time" ]; then
@@ -57,7 +60,7 @@ _checkout() {
       pushd . > /dev/null 2>&1
       cd "$output_dir"
         echo "--- org.joda.time.TestPeriodType::testForFields4" > extra.dependent_tests
-        "$D4J_HOME/framework/util/rm_broken_tests.pl" extra.dependent_tests $("$D4J_HOME/framework/bin/defects4j" export -p dir.src.tests) || return 1
+        "$D4J_HOME_FOR_FL/framework/util/rm_broken_tests.pl" extra.dependent_tests $("$D4J_HOME_FOR_FL/framework/bin/defects4j" export -p dir.src.tests) || return 1
       popd > /dev/null 2>&1
     fi
   fi
@@ -80,8 +83,8 @@ _get_test_classpath() {
   [ -d "$checkout_dir" ] || die "[ERROR] $checkout_dir does not exist!"
 
   cp=$(cd "$checkout_dir" > /dev/null 2>&1 && \
-       $D4J_HOME/framework/bin/defects4j compile > /dev/null 2>&1 && \
-       $D4J_HOME/framework/bin/defects4j export -p cp.test) || die "[ERROR] Get classpath has failed!"
+       $D4J_HOME_FOR_FL/framework/bin/defects4j compile > /dev/null 2>&1 && \
+       $D4J_HOME_FOR_FL/framework/bin/defects4j export -p cp.test) || die "[ERROR] Get classpath has failed!"
   [ "$cp" != "" ] || die "[ERROR] test-classpath is empty!"
 
   echo "$cp"
@@ -102,8 +105,8 @@ _get_src_classes_dir() {
   [ -d "$checkout_dir" ] || die "[ERROR] $checkout_dir does not exist!"
 
   src_classes_dir=$(cd "$checkout_dir" > /dev/null 2>&1 && \
-                     $D4J_HOME/framework/bin/defects4j compile > /dev/null 2>&1 && \
-                     $D4J_HOME/framework/bin/defects4j export -p dir.bin.classes) || die "[ERROR] Get test classes dir has failed!"
+                     $D4J_HOME_FOR_FL/framework/bin/defects4j compile > /dev/null 2>&1 && \
+                     $D4J_HOME_FOR_FL/framework/bin/defects4j export -p dir.bin.classes) || die "[ERROR] Get test classes dir has failed!"
   [ "$src_classes_dir" != "" ] || die "[ERROR] src-classes-dir is empty!"
 
   echo "$checkout_dir/$src_classes_dir" # Return full path
@@ -126,8 +129,8 @@ _get_test_classes_dir() {
   [ -d "$checkout_dir" ] || die "[ERROR] $checkout_dir does not exist!"
 
   test_classes_dir=$(cd "$checkout_dir" > /dev/null 2>&1 && \
-                     $D4J_HOME/framework/bin/defects4j compile > /dev/null 2>&1 && \
-                     $D4J_HOME/framework/bin/defects4j export -p dir.bin.tests)
+                     $D4J_HOME_FOR_FL/framework/bin/defects4j compile > /dev/null 2>&1 && \
+                     $D4J_HOME_FOR_FL/framework/bin/defects4j export -p dir.bin.tests)
   if [ $? -ne 0 ]; then
     if [ "$pid" == "Chart" ]; then
       test_classes_dir="build-tests"
@@ -186,8 +189,8 @@ _collect_list_of_unit_tests() {
     return 1
   fi
 
-  [ "$D4J_HOME" != "" ] || die "[ERROR] D4J_HOME is not set!"
-  [ -d "$D4J_HOME" ] || die "[ERROR] $D4J_HOME does not exist!"
+  [ "$D4J_HOME_FOR_FL" != "" ] || die "[ERROR] D4J_HOME_FOR_FL is not set!"
+  [ -d "$D4J_HOME_FOR_FL" ] || die "[ERROR] $D4J_HOME_FOR_FL does not exist!"
 
   [ "$GZOLTAR_CLI_JAR" != "" ] || die "[ERROR] GZOLTAR_CLI_JAR is not set!"
   [ -s "$GZOLTAR_CLI_JAR" ] || die "[ERROR] $GZOLTAR_CLI_JAR does not exist!"
@@ -213,15 +216,15 @@ _collect_list_of_unit_tests() {
   fi
   echo "[DEBUG] test_classes_dir: $test_classes_dir" >&2
 
-  local relevant_tests_file="$D4J_HOME/framework/projects/$pid/relevant_tests/$bid"
+  local relevant_tests_file="$D4J_HOME_FOR_FL/framework/projects/$pid/relevant_tests/$bid"
   [ -s "$relevant_tests_file" ] || die "[ERROR] $relevant_tests_file does not exist or it is empty!"
   echo "[DEBUG] relevant_tests_file: $relevant_tests_file" >&2
 
   # Some export commands might have removed some build files
   (cd "$checkout_dir" > /dev/null 2>&1 && \
-     $D4J_HOME/framework/bin/defects4j compile > /dev/null 2>&1) || die "[ERROR] Failed to compile the project!"
+     $D4J_HOME_FOR_FL/framework/bin/defects4j compile > /dev/null 2>&1) || die "[ERROR] Failed to compile the project!"
 
-  java -cp $D4J_HOME/framework/projects/lib/junit-4.11.jar:$test_classpath:$GZOLTAR_CLI_JAR \
+  java -cp $D4J_HOME_FOR_FL/framework/projects/lib/junit-4.11.jar:$test_classpath:$GZOLTAR_CLI_JAR \
     com.gzoltar.cli.Main listTestMethods \
       "$test_classes_dir" \
       --outputFile "$output_file" \
@@ -241,8 +244,8 @@ _collect_list_of_likely_faulty_classes() {
     return 1
   fi
 
-  [ "$D4J_HOME" != "" ] || die "[ERROR] D4J_HOME is not set!"
-  [ -d "$D4J_HOME" ] || die "[ERROR] $D4J_HOME does not exist!"
+  [ "$D4J_HOME_FOR_FL" != "" ] || die "[ERROR] D4J_HOME_FOR_FL is not set!"
+  [ -d "$D4J_HOME_FOR_FL" ] || die "[ERROR] $D4J_HOME_FOR_FL does not exist!"
 
   local pid="$1"
   local bid="$2"
@@ -251,7 +254,7 @@ _collect_list_of_likely_faulty_classes() {
   local output_file="$4"
   >"$output_file" || die "[ERROR] Cannot write to $output_file!"
 
-  local loaded_classes_file="$D4J_HOME/framework/projects/$pid/loaded_classes/$bid.src"
+  local loaded_classes_file="$D4J_HOME_FOR_FL/framework/projects/$pid/loaded_classes/$bid.src"
   [ -s "$loaded_classes_file" ] || die "[ERROR] $loaded_classes_file does not exist or it is empty!"
   echo "[DEBUG] loaded_classes_file: $loaded_classes_file" >&2
 
@@ -275,8 +278,8 @@ _run_gzoltar() {
     return 1
   fi
 
-  [ "$D4J_HOME" != "" ] || die "[ERROR] D4J_HOME is not set!"
-  [ -d "$D4J_HOME" ] || die "[ERROR] $D4J_HOME does not exist!"
+  [ "$D4J_HOME_FOR_FL" != "" ] || die "[ERROR] D4J_HOME_FOR_FL is not set!"
+  [ -d "$D4J_HOME_FOR_FL" ] || die "[ERROR] $D4J_HOME_FOR_FL does not exist!"
 
   [ "$GZOLTAR_CLI_JAR" != "" ] || die "[ERROR] GZOLTAR_CLI_JAR is not set!"
   [ -s "$GZOLTAR_CLI_JAR" ] || die "[ERROR] $GZOLTAR_CLI_JAR does not exist or it is empty!"
@@ -292,6 +295,10 @@ _run_gzoltar() {
   local unit_tests_file="$tmp_dir/unit_tests.txt"
   >"$unit_tests_file" || die "[ERROR] Cannot write to $unit_tests_file!"
   _collect_list_of_unit_tests "$pid" "$bid" "$tmp_dir" "$unit_tests_file"
+
+  # debugging
+  exit
+
   if [ $? -ne 0 ]; then
     echo "[ERROR] Collection of unit test cases of the $pid-${bid}b version has failed!" >&2
     return 1
@@ -319,13 +326,13 @@ _run_gzoltar() {
 
   # Some export commands might have removed some build files
   (cd "$tmp_dir" > /dev/null 2>&1 && \
-     $D4J_HOME/framework/bin/defects4j compile > /dev/null 2>&1) || die "[ERROR] Failed to compile the project!"
+     $D4J_HOME_FOR_FL/framework/bin/defects4j compile > /dev/null 2>&1) || die "[ERROR] Failed to compile the project!"
 
   local ser_file="$data_dir/gzoltar.ser"
   echo "[INFO] Start: $(date)" >&2
   (cd "$tmp_dir" > /dev/null 2>&1 && \
     java -XX:MaxPermSize=2048M -javaagent:$GZOLTAR_AGENT_JAR=destfile=$ser_file,buildlocation=$src_classes_dir,includes=$classes_to_debug,excludes="",inclnolocationclasses=false,output="FILE" \
-      -cp $src_classes_dir:$D4J_HOME/framework/projects/lib/junit-4.11.jar:$test_classpath:$GZOLTAR_CLI_JAR \
+      -cp $src_classes_dir:$D4J_HOME_FOR_FL/framework/projects/lib/junit-4.11.jar:$test_classpath:$GZOLTAR_CLI_JAR \
       com.gzoltar.cli.Main runTestMethods \
         --testMethods "$unit_tests_file" \
         --collectCoverage)
@@ -351,8 +358,8 @@ _generate_fault_localization_report() {
     return 1
   fi
 
-  [ "$D4J_HOME" != "" ] || die "[ERROR] D4J_HOME is not set!"
-  [ -d "$D4J_HOME" ] || die "[ERROR] $D4J_HOME does not exist!"
+  [ "$D4J_HOME_FOR_FL" != "" ] || die "[ERROR] D4J_HOME_FOR_FL is not set!"
+  [ -d "$D4J_HOME_FOR_FL" ] || die "[ERROR] $D4J_HOME_FOR_FL does not exist!"
 
   [ "$GZOLTAR_CLI_JAR" != "" ] || die "[ERROR] GZOLTAR_CLI_JAR is not set!"
   [ -s "$GZOLTAR_CLI_JAR" ] || die "[ERROR] $GZOLTAR_CLI_JAR does not exist or it is empty!"
@@ -371,7 +378,7 @@ _generate_fault_localization_report() {
     return 1
   fi
 
-  java -cp $D4J_HOME/framework/projects/lib/junit-4.11.jar:$test_classpath:$GZOLTAR_CLI_JAR \
+  java -cp $D4J_HOME_FOR_FL/framework/projects/lib/junit-4.11.jar:$test_classpath:$GZOLTAR_CLI_JAR \
     com.gzoltar.cli.Main faultLocalizationReport \
       --buildLocation "$src_classes_dir" \
       --outputDirectory "$output_dir" \
