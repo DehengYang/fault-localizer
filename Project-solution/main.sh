@@ -394,7 +394,7 @@ echo -e "time cost of offline instrumentation: $repairTime s"  >> ${data_dir}/ti
     -Dgzoltar-agent.destfile=$SER_FILE \
     -Dgzoltar-agent.output="file" \
     com.gzoltar.cli.Main runTestMethods \
-      --testMethods "$UNIT_TESTS_FILE" \
+      --testMethods "$unit_tests_file" \
       --offline \
       --collectCoverage || die "Coverage collection has failed!"
   
