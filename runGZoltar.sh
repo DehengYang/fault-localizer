@@ -46,11 +46,13 @@ echo "src_classes_dir: $src_classes_dir"
 D4J_DIR=/mnt/recursive-repairthemall/RepairThemAll/benchmarks/defects4j
 
 ##### collect all tests
-# :$deps
-java -cp $src_classes_dir:$test_classpath:$JUNIT_JAR:$HAMCREST_JAR:$GZOLTAR_CLI_JAR \
+# :$deps   $src_classes_dir:
+D4J_HOME_FOR_FL=/mnt/recursive-repairthemall/RepairThemAll/benchmarks/defects4j
+#$test_classpath:
+java -cp $src_classes_dir:$test_classpath:$D4J_HOME_FOR_FL/framework/projects/lib/junit-4.11.jar:$GZOLTAR_CLI_JAR:$deps \
   com.gzoltar.cli.Main listTestMethods $test_classpath \
     --outputFile "$unit_tests_file"
-
+exit
 
 ##### get classes to debug
 cat "$D4J_DIR/framework/projects/$pid/loaded_classes/$bid.src" | sed 's/$/:/' | sed ':a;N;$!ba;s/\n//g'  >  "${output_dir}/classes.txt"
