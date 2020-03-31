@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#echo "start"
+#/mnt/recursive-repairthemall/RepairThemAll/benchmarks/defects4j/framework/projects/Closure/loaded_classes/103.src
 
 SCRIPT_DIR=$(cd `dirname $0` && pwd)
 echo "SCRIPT_DIR: $SCRIPT_DIR"
@@ -54,7 +54,6 @@ _checkout() {
   local version="$3" # either b or f
 
   local output_dir="/tmp/$USER-$$-$pid-$bid"
-  echo "$output_dir" >> time.txt
   rm -rf "$output_dir"; mkdir -p "$output_dir"
   "$D4J_HOME_FOR_FL/framework/bin/defects4j" checkout -p "$pid" -v "${bid}$version" -w "$output_dir" || return 1
   [ -d "$output_dir" ] || die "$output_dir does not exist!"
@@ -249,7 +248,7 @@ C1
   java -cp $D4J_HOME_FOR_FL/framework/projects/lib/junit-4.11.jar:$test_classpath:$GZOLTAR_CLI_JAR \
     com.gzoltar.cli.Main listTestMethods \
       "$test_classes_dir" \
-      --outputFile "$output_file" || die "GZoltar listTestMethods command has failed!"
+      --outputFile "$output_file" --includes $(cat "$relevant_tests_file" | sed 's/$/#*/' | sed ':a;N;$!ba;s/\n/:/g') || die "GZoltar listTestMethods command has failed!"
   [ -s "$output_file" ] || die "[ERROR] $output_file does not exist or it is empty!"
   return 0
 }
@@ -312,7 +311,7 @@ _run_gzoltar() {
   local bid="$3"
   local data_dir="$4"
 
-  local unit_tests_file="$tmp_dir/unit_tests.txt"
+  local unit_tests_file="$data_dir/unit_tests.txt"
   >"$unit_tests_file" || die "[ERROR] Cannot write to $unit_tests_file!"
   _collect_list_of_unit_tests "$pid" "$bid" "$tmp_dir" "$unit_tests_file"
 
@@ -324,7 +323,7 @@ _run_gzoltar() {
     return 1
   fi
 
-  local classes_to_debug_file="$tmp_dir/classes_to_debug.txt"
+  local classes_to_debug_file="$data_dir/classes_to_debug.txt"
   >"$classes_to_debug_file" || die "[ERROR] Cannot write to $classes_to_debug_file!"
   _collect_list_of_likely_faulty_classes "$pid" "$bid" "$tmp_dir" "$classes_to_debug_file"
   if [ $? -ne 0 ]; then
@@ -475,6 +474,8 @@ echo ""
 echo "[INFO] Checkout $pid-${bid}b"
 
 work_dir=$(_checkout "$pid" "$bid" "b")
+
+echo "$work_dir" >> $data_dir/time.txt
 
 if [ $? -ne 0 ]; then
 
