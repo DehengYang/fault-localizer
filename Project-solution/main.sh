@@ -228,7 +228,9 @@ _collect_list_of_unit_tests() {
   fi
   echo "[DEBUG] test_classes_dir: $test_classes_dir" >&2
 
-  local relevant_tests_file="$D4J_HOME_FOR_FL/framework/projects/$pid/relevant_tests/$bid"
+  # dale add
+  local relevant_tests_file="/mnt/benchmarks/buggylocs/Defects4J/Defects4J_${pid}_${bid}/testClasses.txt"
+  #local relevant_tests_file="$D4J_HOME_FOR_FL/framework/projects/$pid/relevant_tests/$bid"
   [ -s "$relevant_tests_file" ] || die "[ERROR] $relevant_tests_file does not exist or it is empty!"
   echo "[DEBUG] relevant_tests_file: $relevant_tests_file" >&2
 
@@ -273,7 +275,10 @@ _collect_list_of_likely_faulty_classes() {
   local output_file="$4"
   >"$output_file" || die "[ERROR] Cannot write to $output_file!"
 
-  local loaded_classes_file="$D4J_HOME_FOR_FL/framework/projects/$pid/loaded_classes/$bid.src"
+  # dale add
+  # /mnt/benchmarks/buggylocs/Defects4J/Defects4J_Closure_103/srcClasses.txt
+  local loaded_classes_file="/mnt/benchmarks/buggylocs/Defects4J/Defects4J_${pid}_${bid}/srcClasses.txt"
+  #local loaded_classes_file="$D4J_HOME_FOR_FL/framework/projects/$pid/loaded_classes/$bid.src"
   [ -s "$loaded_classes_file" ] || die "[ERROR] $loaded_classes_file does not exist or it is empty!"
   echo "[DEBUG] loaded_classes_file: $loaded_classes_file" >&2
 
