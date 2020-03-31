@@ -353,6 +353,7 @@ _run_gzoltar() {
      $D4J_HOME_FOR_FL/framework/bin/defects4j compile > /dev/null 2>&1) || die "[ERROR] Failed to compile the project!"
 
   local ser_file="$data_dir/gzoltar.ser"
+<<C1
   echo "[INFO] Start: $(date)" >&2
   (cd "$tmp_dir" > /dev/null 2>&1 && \
     java -XX:MaxPermSize=2048M -javaagent:$GZOLTAR_AGENT_JAR=destfile=$ser_file,buildlocation=$src_classes_dir,includes=$classes_to_debug,excludes="",inclnolocationclasses=false,output="FILE" \
@@ -360,6 +361,55 @@ _run_gzoltar() {
       com.gzoltar.cli.Main runTestMethods \
         --testMethods "$unit_tests_file" \
         --collectCoverage)
+C1
+
+  # dale add
+  #########################
+  #echo "Perform offline instrumentation ..."
+  # Backup original classes
+
+  echo "src_classes_dir: $src_classes_dir, unit_tests_file: $unit_tests_file"
+  #exit
+startTime=$(date +%s)
+  BUILD_BACKUP_DIR=${src_classes_dir}-ori
+  mv "$src_classes_dir" "$BUILD_BACKUP_DIR" || die "Backup of original classes has failed!"
+  mkdir -p "$src_classes_dir"
+
+  # Perform offline instrumentation     (must add :$test_classpath)
+  java -cp $BUILD_BACKUP_DIR:$GZOLTAR_AGENT_JAR:$GZOLTAR_CLI_JAR:$test_classpath \
+    com.gzoltar.cli.Main instrument \
+    --outputDirectory "$src_classes_dir" \
+    $BUILD_BACKUP_DIR || die "Offline instrumentation has failed!"
+
+endTime=$(date +%s)
+#echo "end time `date '+%Y%m%d %H%M%S'`"  >> ${data_dir}/time.txt
+repairTime=$(($endTime-$startTime))
+echo -e "time cost of offline instrumentation: $repairTime s"  >> ${data_dir}/time.txt
+
+  echo "Run each unit test case in isolation ..."
+
+  # Run each unit test case in isolation ( must add test_classes_dir in -cp)
+  #  $test_classes_dir  $src_classes_dir:
+  java -cp $D4J_HOME_FOR_FL/framework/projects/lib/junit-4.11.jar:$test_classpath:$GZOLTAR_CLI_JAR:$GZOLTAR_AGENT_JAR  \
+    -Dgzoltar-agent.destfile=$SER_FILE \
+    -Dgzoltar-agent.output="file" \
+    com.gzoltar.cli.Main runTestMethods \
+      --testMethods "$UNIT_TESTS_FILE" \
+      --offline \
+      --collectCoverage || die "Coverage collection has failed!"
+  
+  # Restore original classes
+  cp -R $BUILD_BACKUP_DIR/* "$src_classes_dir" || die "Restore of original classes has failed!"
+  rm -rf "$BUILD_BACKUP_DIR"
+
+endTime=$(date +%s)
+#echo "end time `date '+%Y%m%d %H%M%S'`"  >> ${data_dir}/time.txt
+repairTime=$(($endTime-$startTime))
+echo -e "time cost of offline instrumentation & collectCoverage: $repairTime s"  >> ${data_dir}/time.txt
+
+  ######################### 
+  
+
   if [ $? -ne 0 ]; then
     echo "[ERROR] GZoltar runTestMethods command has failed for $pid-${bid}b version!" >&2
     return 1
@@ -437,6 +487,8 @@ _generate_fault_localization_report() {
 # --- VARIABLES THAT SHOULD BE UPDATED [BEGIN] ---------------------------------
 
 export GZOLTAR_CLI_JAR="$SCRIPT_DIR/../lib/com.gzoltar.cli-1.7.3-SNAPSHOT-jar-with-dependencies.jar"
+
+#export GZOLTAR_AGENT_RT_JAR="$SCRIPT_DIR/../lib/com.gzoltar.agent.rt-$GZOLTAR_VERSION-all.jar"
 
 export GZOLTAR_AGENT_JAR="$SCRIPT_DIR/../lib/com.gzoltar.agent.rt-1.7.3-SNAPSHOT-all.jar"
 
