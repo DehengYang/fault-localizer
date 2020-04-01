@@ -320,6 +320,10 @@ _run_gzoltar() {
   >"$unit_tests_file" || die "[ERROR] Cannot write to $unit_tests_file!"
   _collect_list_of_unit_tests "$pid" "$bid" "$tmp_dir" "$unit_tests_file"
 
+  # java.io.FileNotFoundException: /home/apr/apr_tools/fault-localizer/Project-solution (Is a directory)
+  cp $unit_tests_file $tmp_dir/unit_tests.txt
+  unit_tests_file_2="$tmp_dir/unit_tests.txt"
+
   # debugging
   #exit
 
@@ -353,7 +357,7 @@ _run_gzoltar() {
      $D4J_HOME_FOR_FL/framework/bin/defects4j compile > /dev/null 2>&1) || die "[ERROR] Failed to compile the project!"
 
   local ser_file="$data_dir/gzoltar.ser"
-<<C1
+#<<C1
   echo "[INFO] Start: $(date)" >&2
   (cd "$tmp_dir" > /dev/null 2>&1 && \
     java -XX:MaxPermSize=2048M -javaagent:$GZOLTAR_AGENT_JAR=destfile=$ser_file,buildlocation=$src_classes_dir,includes=$classes_to_debug,excludes="",inclnolocationclasses=false,output="FILE" \
@@ -361,10 +365,22 @@ _run_gzoltar() {
       com.gzoltar.cli.Main runTestMethods \
         --testMethods "$unit_tests_file" \
         --collectCoverage)
-C1
+#C1
 
   # dale add
-  #########################
+  ######################### It does really report lots of fileNotFound errors. Finally I found that this is because there are many java -cp process, so I run pkill -9 java and it works well.
+<<C1
+2700 test cases & about 15 minutes. The offline approach is not good enough.
+And it reports error:
+java.util.concurrent.ExecutionException: java.lang.OutOfMemoryError: Compressed class space
+	at java.util.concurrent.FutureTask.report(FutureTask.java:122)
+	at java.util.concurrent.FutureTask.get(FutureTask.java:192)
+	at com.gzoltar.internal.core.test.TestRunner.run(TestRunner.java:30)
+	at com.gzoltar.cli.commands.RunTestMethods.execute(RunTestMethods.java:105)
+	at com.gzoltar.cli.Main.execute(Main.java:105)
+	at com.gzoltar.cli.Main.main(Main.java:40)
+C1
+<<C1
   #echo "Perform offline instrumentation ..."
   # Backup original classes
 
@@ -389,17 +405,19 @@ echo -e "time cost of offline instrumentation: $repairTime s"  >> ${data_dir}/ti
   echo "Run each unit test case in isolation ..."
 
   # Run each unit test case in isolation ( must add test_classes_dir in -cp)
-  #  $test_classes_dir  $src_classes_dir:
-  java -cp $D4J_HOME_FOR_FL/framework/projects/lib/junit-4.11.jar:$test_classpath:$GZOLTAR_CLI_JAR:$GZOLTAR_AGENT_JAR  \
-    -Dgzoltar-agent.destfile=$SER_FILE \
-    -Dgzoltar-agent.output="file" \
+  #  $test_classes_dir  $src_classes_dir:               $D4J_HOME_FOR_FL/framework/projects/lib/junit-4.11.jar
+  (cd "$tmp_dir" > /dev/null 2>&1 && \
+  java -cp $JUNIT_JAR:$HAMCREST_JAR:$test_classpath:$GZOLTAR_CLI_JAR:$GZOLTAR_AGENT_JAR  \
+    -Dgzoltar-agent.destfile=$ser_file \
+    -Dgzoltar-agent.output="FILE" \
     com.gzoltar.cli.Main runTestMethods \
-      --testMethods "$unit_tests_file" \
+      --testMethods "$unit_tests_file_2" \
       --offline \
-      --collectCoverage || die "Coverage collection has failed!"
+      --collectCoverage)
+# || die "Coverage collection has failed!"
   
   # Restore original classes
-  cp -R $BUILD_BACKUP_DIR/* "$src_classes_dir" || die "Restore of original classes has failed!"
+  cp -R $BUILD_BACKUP_DIR/* "$src_classes_dir/" || die "Restore of original classes has failed!"
   rm -rf "$BUILD_BACKUP_DIR"
 
 endTime=$(date +%s)
@@ -408,7 +426,7 @@ repairTime=$(($endTime-$startTime))
 echo -e "time cost of offline instrumentation & collectCoverage: $repairTime s"  >> ${data_dir}/time.txt
 
   ######################### 
-  
+C1  
 
   if [ $? -ne 0 ]; then
     echo "[ERROR] GZoltar runTestMethods command has failed for $pid-${bid}b version!" >&2
@@ -492,6 +510,8 @@ export GZOLTAR_CLI_JAR="$SCRIPT_DIR/../lib/com.gzoltar.cli-1.7.3-SNAPSHOT-jar-wi
 
 export GZOLTAR_AGENT_JAR="$SCRIPT_DIR/../lib/com.gzoltar.agent.rt-1.7.3-SNAPSHOT-all.jar"
 
+export JUNIT_JAR="$SCRIPT_DIR/../lib/junit-4.12.jar"
+export HAMCREST_JAR="$SCRIPT_DIR/../lib/hamcrest-core-1.3.jar"
 
 
 [ -s "$GZOLTAR_CLI_JAR" ] || die "$GZOLTAR_CLI_JAR does not exist or it is empty!"
