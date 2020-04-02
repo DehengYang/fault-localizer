@@ -114,7 +114,7 @@ _collect_list_of_likely_faulty_classes() {
 #
 _run_gzoltar() {
   local USAGE="Usage: ${FUNCNAME[0]} <bug_dir> <data_dir> <test_classpath> <test_classes_dir> <src_classes_file> <src_classes_dir> <all_tests_file>"
-  if [ "$#" != 6 ]; then
+  if [ "$#" != 7 ]; then
     echo "$USAGE" >&2
     return 1
   fi
@@ -183,8 +183,8 @@ _run_gzoltar() {
 # .ser file.
 #
 _generate_fault_localization_report() {
-  local USAGE="Usage: ${FUNCNAME[0]} <bug_dir> <ser_file_path> <output_dir>"
-  if [ "$#" != 3 ]; then
+  local USAGE="Usage: ${FUNCNAME[0]} <ser_file_path> <output_dir> <test_classpath> <src_classes_dir>"
+  if [ "$#" != 4 ]; then
     echo "$USAGE" >&2
     return 1
   fi
@@ -192,15 +192,14 @@ _generate_fault_localization_report() {
   [ "$GZOLTAR_CLI_JAR" != "" ] || die "[ERROR] GZOLTAR_CLI_JAR is not set!"
   [ -s "$GZOLTAR_CLI_JAR" ] || die "[ERROR] $GZOLTAR_CLI_JAR does not exist or it is empty!"
 
-  local tmp_dir="$1"
-  local ser_file_path="$2"
-  local output_dir="$3"
+  local ser_file_path="$1"
+  local output_dir="$2"
+  local test_classpath="$3"
+  local src_classes_dir="$4"
 
-  [ -d "$tmp_dir" ]       || die "$tmp_dir does not exist!"
   [ -s "$ser_file_path" ] || die "$ser_file_path does not exist or it is empty!"
   mkdir -p "$output_dir" || die "Failed to create $output_dir!"
 
-  local src_classes_dir=$(_get_src_classes_dir "$tmp_dir")
   if [ $? -ne 0 ]; then
     echo "[ERROR] _get_src_classes_dir has failed!" >&2
     return 1
@@ -290,7 +289,7 @@ repairTime=$(($endTime-$startTime))
 echo -e "time cost: $repairTime s"  >> $fl_time
 
 echo "[INFO] Generate fault localization report"
-_generate_fault_localization_report "$bug_dir" "$data_dir/gzoltar.ser" "$data_dir" || die "[ERROR] Failed to generate a fault localization report!"
+_generate_fault_localization_report "$data_dir/gzoltar.ser" "$data_dir" "$test_classpath" "$src_classes_dir" || die "[ERROR] Failed to generate a fault localization report!"
 
 endTime=$(date +%s)
 echo "end time `date '+%Y%m%d %H%M%S'`"  >> $fl_time
