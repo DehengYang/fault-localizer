@@ -380,6 +380,7 @@ java.util.concurrent.ExecutionException: java.lang.OutOfMemoryError: Compressed 
 	at com.gzoltar.cli.Main.execute(Main.java:105)
 	at com.gzoltar.cli.Main.main(Main.java:40)
 C1
+
 <<C1
   #echo "Perform offline instrumentation ..."
   # Backup original classes
@@ -414,8 +415,8 @@ echo -e "time cost of offline instrumentation: $repairTime s"  >> ${data_dir}/ti
       --testMethods "$unit_tests_file_2" \
       --offline \
       --collectCoverage)
-# || die "Coverage collection has failed!"
-  
+  # || die "Coverage collection has failed!"
+ 
   # Restore original classes
   cp -R $BUILD_BACKUP_DIR/* "$src_classes_dir/" || die "Restore of original classes has failed!"
   rm -rf "$BUILD_BACKUP_DIR"
@@ -426,7 +427,7 @@ repairTime=$(($endTime-$startTime))
 echo -e "time cost of offline instrumentation & collectCoverage: $repairTime s"  >> ${data_dir}/time.txt
 
   ######################### 
-C1  
+C1
 
   if [ $? -ne 0 ]; then
     echo "[ERROR] GZoltar runTestMethods command has failed for $pid-${bid}b version!" >&2
